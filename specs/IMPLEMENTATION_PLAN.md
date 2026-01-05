@@ -411,16 +411,18 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 1. Create models in `app/models/`:
    - `QuizRequest`
    - `QuizResponse`
-   - `Question`
+   - `Question` (with reference URL field)
    - `Option`
    - `SubmitRequest`
    - `SubmitResponse`
 2. Add validation rules (min/max values, string lengths)
-3. Create example instances for testing
+3. Add `reference_url` field to `Question` model for Wikipedia section links
+4. Create example instances for testing
 
 **Acceptance Criteria:**
 - [ ] All models defined with proper types
 - [ ] Validation rules enforce PRD requirements (3-20 questions, 2-200 char topics)
+- [ ] Question model includes optional `reference_url: str` field
 - [ ] Models generate correct JSON schema
 - [ ] Unit tests for validation pass
 
@@ -642,7 +644,7 @@ Return structured JSON.
 ---
 
 #### Task 2.4: Node 3 - Question Generation
-**Description:** Generate multiple-choice questions using Claude
+**Description:** Generate multiple-choice questions using Claude with reference URLs
 
 **Dependencies:** Task 2.3
 
@@ -651,10 +653,11 @@ Return structured JSON.
 **Steps:**
 1. Create `app/agents/nodes/question_generator.py`
 2. Design Claude prompt for question generation
-3. Request structured JSON output
-4. Implement parallel generation for efficiency
-5. Handle partial failures
-6. Ensure correct number of questions
+3. Request structured JSON output including reference information
+4. Generate Wikipedia section URLs for each question's answer
+5. Implement parallel generation for efficiency
+6. Handle partial failures
+7. Ensure correct number of questions
 
 **Prompt Strategy:**
 ```
@@ -665,16 +668,23 @@ For each question:
 - Ask about factual information from the text
 - Provide exactly 4 answer options (A, B, C, D)
 - Mark the correct answer
+- Identify the specific Wikipedia section or heading where the answer can be found
 - Make incorrect answers plausible but clearly wrong
 - Ensure diversity in question types
 
-Return as JSON array.
+Return as JSON array with reference information for verification.
 ```
+
+**Reference URL Format:**
+- Base Wikipedia URL + article title + section anchor
+- Example: `https://en.wikipedia.org/wiki/Novo_Nordisk#Products_and_research`
 
 **Acceptance Criteria:**
 - [ ] Generates requested number of questions
 - [ ] Each question has 4 options
 - [ ] Questions are factually grounded in content
+- [ ] Each question includes a reference URL to relevant Wikipedia section
+- [ ] Reference URLs are properly formatted and valid
 - [ ] Distractors are plausible
 - [ ] Completes in <4 seconds
 - [ ] Returns structured data matching schema
@@ -830,7 +840,7 @@ graph.set_entry_point("topic_resolution")
 ---
 
 #### Task 3.4: Results Display Page
-**Description:** Show quiz results with detailed feedback
+**Description:** Show quiz results with detailed feedback and reference links
 
 **Dependencies:** Task 3.1
 
@@ -843,11 +853,17 @@ graph.set_entry_point("topic_resolution")
    - User's answer
    - Correct answer
    - Correct/incorrect indicator
+   - Reference link to Wikipedia section (inline with correct answer)
 4. Add navigation options (retake, new quiz)
 5. Add visual styling (colors for correct/incorrect)
+6. Implement clickable "Verify" links that open Wikipedia in new tab
 
 **Acceptance Criteria:**
 - [ ] Score displayed prominently
+- [ ] Each correct answer includes a "Verify" reference link
+- [ ] Reference links point to specific Wikipedia article sections
+- [ ] Links open in new browser tab (target="_blank" with rel="noopener noreferrer")
+- [ ] Reference links are visually distinct (colored, underlined)
 - [ ] All questions shown with feedback
 - [ ] Correct answers highlighted
 - [ ] User's incorrect answers shown

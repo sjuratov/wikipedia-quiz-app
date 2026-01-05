@@ -172,7 +172,8 @@ async def submit_quiz(request: SubmitRequest):
             selected_answer_text=selected_option.text if selected_option else "Unknown",
             correct_answer_id=question.correct_answer_id,
             correct_answer_text=correct_option.text if correct_option else "Unknown",
-            is_correct=is_correct
+            is_correct=is_correct,
+            reference_url=question.reference_url
         ))
     
     total = len(results)

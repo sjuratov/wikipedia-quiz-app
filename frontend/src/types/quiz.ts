@@ -13,6 +13,7 @@ export interface Question {
   text: string;
   options: Option[];
   correct_answer_id: string;
+  reference_url?: string;
 }
 
 export interface QuizResponse {
@@ -43,6 +44,7 @@ export interface QuizResult {
   correct_answer_id: string;
   correct_answer_text: string;
   is_correct: boolean;
+  reference_url?: string;
 }
 
 export interface ScoreSummary {

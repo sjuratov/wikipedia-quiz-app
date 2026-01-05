@@ -149,6 +149,7 @@ Students, educators, and lifelong learners need an accessible way to test their 
 - Indicate which questions were answered correctly/incorrectly
 - Display the correct answer for all questions
 - Show user's selected answer for comparison
+- Provide reference links to Wikipedia for answer verification
 - Option to retake quiz or generate new quiz on same/different topic
 
 **Acceptance Criteria:**
@@ -156,6 +157,9 @@ Students, educators, and lifelong learners need an accessible way to test their 
 - [ ] Each question shows correct/incorrect status
 - [ ] Correct answers are clearly highlighted
 - [ ] User's incorrect selections are shown alongside correct answers
+- [ ] Each correct answer includes a clickable "Verify" reference link
+- [ ] Reference links point to specific Wikipedia article sections containing the answer
+- [ ] Reference links open in a new browser tab
 - [ ] Results page includes clear navigation options (retake, new quiz, change topic)
 - [ ] Results persist until user initiates a new action
 

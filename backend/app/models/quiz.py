@@ -31,6 +31,7 @@ class Question(BaseModel):
     text: str = Field(..., description="Question text")
     options: List[Option] = Field(..., min_length=4, max_length=4, description="Four answer options")
     correct_answer_id: str = Field(..., description="ID of the correct option")
+    reference_url: Optional[str] = Field(None, description="Wikipedia reference URL for answer verification")
     
     @field_validator('correct_answer_id')
     @classmethod
@@ -75,6 +76,7 @@ class QuizResult(BaseModel):
     correct_answer_id: str
     correct_answer_text: str
     is_correct: bool
+    reference_url: Optional[str] = None
 
 
 class ScoreSummary(BaseModel):

@@ -145,6 +145,7 @@ Requirements for each question:
 5. Questions should test factual understanding
 6. Avoid questions that require memorizing long lists
 7. Make questions clear and unambiguous
+8. Identify the Wikipedia section heading where the answer is found (if determinable)
 
 Return your response as a JSON array of questions, where each question has this structure:
 {
@@ -155,7 +156,8 @@ Return your response as a JSON array of questions, where each question has this 
         {"id": "C", "text": "Option C text"},
         {"id": "D", "text": "Option D text"}
     ],
-    "correct_answer_id": "A"
+    "correct_answer_id": "A",
+    "section_heading": "Section Name" (optional - include if the answer is found in a specific section)
 }
 
 IMPORTANT: Return ONLY the JSON array, no other text or formatting."""
@@ -212,6 +214,7 @@ Generate exactly {num_questions} multiple-choice questions based on this content
     async def validate_questions(self, state: QuizGenerationState) -> Dict[str, Any]:
         """Node 4: Validate and structure questions."""
         raw_questions = state.get("raw_questions", [])
+        resolved_topic = state.get("resolved_topic", state["topic"])
         
         if not raw_questions:
             return {
@@ -227,10 +230,17 @@ Generate exactly {num_questions} multiple-choice questions based on this content
                 options = q_data.get("options", [])
                 random.shuffle(options)
                 
+                # Construct reference URL
+                reference_url = self._construct_reference_url(
+                    resolved_topic,
+                    q_data.get("section_heading")
+                )
+                
                 question = Question(
                     text=q_data["text"],
                     options=[Option(**opt) for opt in options],
-                    correct_answer_id=q_data["correct_answer_id"]
+                    correct_answer_id=q_data["correct_answer_id"],
+                    reference_url=reference_url
                 )
                 validated.append(question)
             except Exception as e:
@@ -241,6 +251,26 @@ Generate exactly {num_questions} multiple-choice questions based on this content
             "validated_questions": validated,
             "metadata": {"stage": "validation", "success": True, "validated_count": len(validated)}
         }
+    
+    def _construct_reference_url(self, article_title: str, section_heading: Optional[str] = None) -> str:
+        """Construct Wikipedia reference URL with optional section anchor."""
+        from urllib.parse import quote
+        
+        # Encode article title (replace spaces with underscores, URL encode special chars)
+        encoded_title = article_title.replace(" ", "_")
+        encoded_title = quote(encoded_title, safe="_")
+        
+        base_url = f"https://en.wikipedia.org/wiki/{encoded_title}"
+        
+        # Add section anchor if provided
+        if section_heading:
+            # Format section anchor (replace spaces with underscores)
+            section_anchor = section_heading.replace(" ", "_")
+            # URL encode special characters in the anchor
+            section_anchor = quote(section_anchor, safe="_")
+            return f"{base_url}#{section_anchor}"
+        
+        return base_url
     
     async def generate_quiz(self, topic: str, num_questions: int) -> Dict[str, Any]:
         """Run the complete quiz generation pipeline."""

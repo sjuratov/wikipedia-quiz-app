@@ -46,6 +46,20 @@ export default function ResultsDisplay({ results, onNewQuiz }: ResultsDisplayPro
               )}
               <div className="result-answer correct-answer">
                 Correct answer: {result.correct_answer_id}. {result.correct_answer_text}
+                {result.reference_url && (
+                  <>
+                    {' '}
+                    <a
+                      href={result.reference_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="verify-link"
+                      aria-label={`Verify answer on Wikipedia`}
+                    >
+                      (Verify)
+                    </a>
+                  </>
+                )}
               </div>
             </div>
           </div>
