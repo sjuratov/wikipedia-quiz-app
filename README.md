@@ -1,547 +1,171 @@
+# Wikipedia Quiz Application
 
-# spec2cloud
+AI-powered quiz generator that creates custom multiple-choice quizzes from Wikipedia articles using Azure OpenAI.
 
-**Spec2Cloud** is an AI-powered development workflow that transforms high-level product ideas into production-ready applications deployed on Azure—using specialized GitHub Copilot agents working together.
+## ✨ Features
 
-https://github.com/user-attachments/assets/f0529e70-f437-4a14-93bc-4ab5a0450540
-
-## 🎯 Overview
-
-This repository provides a preconfigured development environment and agent-driven workflow that works in two directions:
-
-- **Greenfield (Build New)**: Transform product ideas into deployed applications through structured specification-driven development
-- **Brownfield (Document Existing + Modernize)**: Reverse engineer existing codebases into comprehensive product and technical documentation and optionally modernize codebases
-
-Both workflows use specialized GitHub Copilot agents working together to maintain consistency, traceability, and best practices.
+- **🎯 Any Topic**: Generate quizzes on virtually any Wikipedia topic
+- **🤖 AI-Powered**: Intelligent question generation using Azure OpenAI
+- **📊 Customizable**: Choose number of questions (3-20)
+- **✅ Instant Feedback**: Immediate results with detailed explanations
+- **🔗 Source Verification**: Direct links to Wikipedia sources for each answer
+- **💾 Smart Caching**: Reduced API calls with intelligent caching
+- **📱 Responsive**: Works on desktop and mobile devices
 
 ## 🚀 Quick Start
 
-### Option 1: Use This Repository as a Template (Full Environment)
+### Prerequisites
 
-**Greenfield (New Project)**:
-1. **Use this repo as a template** - Click "Use this template" to create your own GitHub repository
-2. **Open in Dev Container** - Everything is preconfigured in `.devcontainer/`
-3. **Describe your app idea** - The more specific, the better
-4. **Follow the workflow** - Use the prompts to guide specialized agents through each phase
+- Python 3.11+
+- Node.js 18+
+- Azure OpenAI API access (endpoint, API key, deployment name)
 
-**Brownfield (Existing Codebase)**:
-1. **Use this repo as a template** - Click "Use this template" to create your own GitHub repository
-2. **copy your existing codebase** into the new repository
-3. **Open in Dev Container** - Everything is preconfigured in `.devcontainer/`
-4. **Run `/rev-eng`** - Reverse engineer codebase into specs and documentation
-5. **Run `/modernize`** - (optional) Create modernization plan and tasks
-6. **Run `/plan`** - (optional) Execute modernization tasks planned by the modernization agent
+### Setup (First Time)
 
-### Option 2: Install Into Existing Project using VSCode Extension
+```powershell
+# Run automated setup script
+.\setup.ps1
 
-TODO
+# Configure your Azure OpenAI credentials
+# Edit backend\.env and add:
+# - AZURE_OPENAI_ENDPOINT
+# - AZURE_OPENAI_API_KEY
+# - AZURE_OPENAI_API_VERSION
+# - AZURE_OPENAI_DEPLOYMENT_NAME
 
-### Option 3: Install Into Existing Project using APM CLI
-
-TODO
-
-### Option 4: Install Into Existing Project using Manual Script
-
-Transform any existing project into a spec2cloud-enabled development environment:
-
-**One-Line Install** (Recommended):
-```bash
-curl -fsSL https://raw.githubusercontent.com/EmeaAppGbb/spec2cloud/main/scripts/quick-install.sh | bash
+# Start development servers
+.\start-dev.ps1
 ```
 
-**Manual Install**:
-```bash
-# Download latest release
-curl -L https://github.com/EmeaAppGbb/spec2cloud/releases/latest/download/spec2cloud-full-latest.zip -o spec2cloud.zip
-unzip spec2cloud.zip -d spec2cloud
-cd spec2cloud
+Open http://localhost:5173 in your browser 🎉
 
-# Run installer
-./scripts/install.sh --full                    # Linux/Mac
-.\scripts\install.ps1 -Full                    # Windows
+### Daily Development
 
-# Start using workflows
-code .
-# Use @pm, @dev, @azure agents and /prd, /frd, /plan, /deploy prompts
+```powershell
+# Start both backend and frontend servers
+.\start-dev.ps1
 ```
 
-**What Gets Installed**:
-- ✅ 8 specialized AI agents (PM, Dev Lead, Dev, Azure, Rev-Eng, Modernizer, Planner, Architect)
-- ✅ 13 workflow prompts
-- ✅ MCP server configuration (optional)
-- ✅ Dev container setup (optional)
-- ✅ APM configuration (optional)
+## 📖 Documentation
 
-See **[INTEGRATION.md](INTEGRATION.md)** for detailed installation options and troubleshooting.
-
+- **[Setup Guide](docs/SETUP_GUIDE.md)** - Detailed installation and troubleshooting
+- **[Quick Reference](docs/QUICK_REFERENCE.md)** - Commands, URLs, and daily workflows
+- **[Integration Guide](docs/INTEGRATION.md)** - Spec2cloud integration details
+- **[Specifications](specs/)** - Product requirements and technical documentation
 
 ## 🏗️ Architecture
 
-### Development Environment
+### Technology Stack
 
-The `.devcontainer/` folder provides a **ready-to-use development container** with:
-- Python 3.12
-- Azure CLI & Azure Developer CLI (azd)
-- TypeScript
-- Docker-in-Docker
-- VS Code extensions: GitHub Copilot Chat, Azure Pack, AI Studio
+**Backend:**
+- FastAPI (Python)
+- Azure OpenAI (GPT-4)
+- LangGraph (Agent pipeline)
+- Wikipedia API
 
-### MCP Servers
+**Frontend:**
+- React + TypeScript
+- Vite
+- Modern CSS
 
-The `.vscode/mcp.json` configures **Model Context Protocol servers** that give agents access to:
-- **context7** - Up-to-date library documentation
-- **github** - Repository management and operations
-- **microsoft.docs.mcp** - Official Microsoft/Azure documentation
-- **playwright** - Browser automation capabilities
-- **deepwiki** - Repository context and understanding for external repos
+**Deployment:**
+- Docker
+- Azure (optional)
 
-### AI Agents (Chat Modes)
-
-six specialized agents in `.github/chatmodes/`:
-
-#### 1. **PM Agent** (`@pm`) - Product Manager
-- **Model**: o3-mini
-- **Tools**: Edit files, search, fetch web content
-- **Purpose**: Translates ideas into structured PRDs and FRDs
-- **Instructions**: Asks clarifying questions, identifies business goals, creates living documentation
-
-#### 2. **Dev Lead Agent** (`@dev-lead`) - Technical Lead
-- **Model**: Claude Sonnet 4
-- **Tools**: Read files, search, semantic analysis  
-- **Purpose**: Reviews architecture, provides technical guidance, ensures adherence to `AGENTS.md`
-- **Instructions**: Analyzes engineering patterns, reviews technical decisions, validates against standards
-- **Note**: AGENTS.md is auto-generated by `apm compile`
-
-#### 3. **Dev Agent** (`@dev`) - Developer
-- **Model**: Claude Sonnet 4
-- **Tools**: Full development suite + Context7, GitHub, Microsoft Docs, Copilot Coding Agent, AI Toolkit
-- **Purpose**: Breaks down features into tasks, implements code, or delegates to GitHub Copilot
-- **Instructions**: Analyzes specs, writes modular code, follows architectural patterns, creates GitHub issues
-
-#### 4. **Azure Agent** (`@azure`) - Cloud Architect
-- **Model**: Claude Sonnet 4
-- **Tools**: Azure resource management, Bicep, deployment tools, infrastructure best practices
-- **Purpose**: Deploys applications to Azure with IaC and CI/CD pipelines
-- **Instructions**: Analyzes codebase, generates Bicep templates, creates GitHub Actions, uses Azure Dev CLI
-
-
-#### 5. **Reverse Engineering Tech Analyst Agent** (`@tech-analist`) - Technical Analyst
-- **Model**: Claude Sonnet 4
-- **Tools**: Code analysis, documentation generation, specification extraction
-- **Purpose**: Reverse engineers existing codebases into specifications and documentation
-- **Instructions**: Analyzes codebase, generates technical tasks, creates feature requirements, synthesizes product vision
-
-
-#### 4. **Modernization Agent** (`@modernize`) - Modernization Specialist
-- **Model**: Claude Sonnet 4
-- **Tools**: Code analysis, modernization planning, risk assessment
-- **Purpose**: Analyzes existing codebases for modernization opportunities and creates implementation plans
-- **Instructions**: Assesses technical debt, crafts modernization strategies, develops risk management plans
-
-
-## 📋 Workflows
-
-### Greenfield Workflow (Forward: Idea → Code)
-
-```mermaid
-graph TB
-    Start[("👤 User<br/>High-level app description")]
-    
-    Start --> PRD["<b>/prd</b><br/>📝 PM Agent creates<br/>Product Requirements Document"]
-    
-    PRD --> FRD["<b>/frd</b><br/>📋 PM Agent breaks down<br/>Feature Requirements Documents"]
-    
-    FRD --> GenAgents["<b>/generate-agents</b><br/>📦 Dev Lead reads standards<br/>Generates AGENTS.md"]
-    
-    GenAgents --> Plan["<b>/plan</b><br/>🔧 Dev Agent creates<br/>Technical Task Breakdown"]
-    
-    Plan --> Choice{"Implementation<br/>Choice"}
-    
-    Choice -->|Local| Implement["<b>/implement</b><br/>💻 Dev Agent<br/>implements code locally"]
-    
-    Choice -->|Delegated| Delegate["<b>/delegate</b><br/>🎯 Dev Agent creates<br/>GitHub Issue + assigns<br/>Copilot Coding Agent"]
-    
-    Implement --> Deploy["<b>/deploy</b><br/>☁️ Azure Agent<br/>creates IaC + deploys to Azure"]
-    
-    Delegate --> Deploy
-    
-    Deploy --> Done[("✅ Production-Ready<br/>Application on Azure")]
-    
-    style Start fill:#e1f5ff
-    style PRD fill:#fff4e6
-    style FRD fill:#fff4e6
-    style GenAgents fill:#e3f2fd
-    style Plan fill:#e8f5e9
-    style Implement fill:#e8f5e9
-    style Delegate fill:#e8f5e9
-    style Deploy fill:#f3e5f5
-    style Done fill:#e1f5ff
-    style Choice fill:#fff9c4
-```
-
-### Brownfield Workflow (Reverse: Code → Documentation)
-
-```mermaid
-graph TB
-    StartBrown[("📦 Existing Codebase<br/>Undocumented or<br/>poorly documented")]
-    
-    StartBrown --> Rev-Eng["<b>/rev-eng</b><br/>📋 Reverse Engineering Agent Analyses code<br/>& documents technical tasks"]
-    
-    Rev-Eng --> Modernize["<b>/modernize</b><br/>(Optional)<br/>💻 Modernization Agent Documents<br/>& documents modernization tasks"]
-    
-    Modernize --> Plan["<b>/plan</b><br/>(Optional)<br/>💻 Developer Agent Implements<br/>Modernization tasks"]
-    
-    Plan --> Deploy["<b>/deploy</b><br/>(Optional)<br/>☁️ Azure Agent<br/>creates IaC + deploys to Azure"]
-
-    Deploy --> Done[("✅ Modernized(optional) and documented<br/>Application on Azure")]
-
-    Rev-Eng --> Done
-        
-    style StartBrown fill:#ffe0b2
-    style Rev-Eng fill:#e8f5e9
-    style Modernize fill:#e8f5e9
-    style Plan fill:#e8f5e9
-    style Deploy fill:#f3e5f5
-    style Done fill:#e1f5ff
-```
-
-### Greenfield Workflow Steps (Forward)
-
-1. **`/prd`** - Product Requirements Document
-   - PM Agent engages in conversation to understand the product vision
-   - Creates `specs/prd.md` with goals, scope, requirements, and user stories
-   - Living document that evolves with feedback
-
-2. **`/frd`** - Feature Requirements Documents
-   - PM Agent decomposes the PRD into individual features
-   - Creates files in `specs/features/` for each feature
-   - Defines inputs, outputs, dependencies, and acceptance criteria
-
-3. **`/generate-agents`** - Generate Agent Guidelines (Optional)
-   - Dev Lead Agent reads all standards from `standards/` directory
-   - Consolidates engineering standards into comprehensive `AGENTS.md`
-   - Can be run at project start or deferred until before `/plan` and `/implement`
-   - **Must be completed before planning and implementation begins**
-
-4. **`/plan`** - Technical Planning
-   - Dev Agent analyzes FRDs and creates technical task breakdowns
-   - Creates files in `specs/tasks/` with implementation details
-   - Identifies dependencies, estimates complexity, defines scaffolding needs
-
-5. **`/implement`** OR **`/delegate`** - Implementation
-   - **Option A (`/implement`)**: Dev Agent writes code directly in `src/backend` and `src/frontend`
-   - **Option B (`/delegate`)**: Dev Agent creates GitHub Issues with full task descriptions and assigns to GitHub Copilot Coding Agent
-   
-6. **`/deploy`** - Azure Deployment
-   - Azure Agent analyzes the codebase
-   - Generates Bicep IaC templates
-   - Creates GitHub Actions workflows for CI/CD
-   - Deploys to Azure using Azure Dev CLI and MCP tools
-
-### Brownfield Workflow Steps (Reverse)
-
-
-1. **`/rev-eng`** - Reverse Engineer Codebase
-   - Reverse Engineering Agent analyzes existing codebase
-   - Creates technical tasks, feature requirements, and product vision documents
-   - Follows strict rules to ensure accuracy and honesty about existing functionality
-   - **Critical Rules**:
-     - ⚠️ **NEVER modifies code** - Read-only analysis
-     - ⚠️ **Documents ONLY what exists** - No fabrication
-     - ⚠️ **Honest about gaps** - Notes missing tests, incomplete features
-     - Links each task to actual code files and implementations
-
-2. **`/modernize`** - Create Modernization Plan (Optional)
-   - Modernization Agent assesses existing codebase for modernization opportunities
-   - Creates files in `specs/modernize/` with modernization analysis 
-   - Creates files in `specs/tasks/` with specific modernization tasks
-   - Develops risk assessment and mitigation strategies
-   - **Critical Rules**:
-     - ⚠️ **NEVER modifies code** - Read-only analysis
-     - ⚠️ **Evidence-based** - Recommendations based on actual code quality
-     - ⚠️ **Honest about feasibility** - Notes technical debt and potential risks
-
-3. **`/plan`** - Implement Modernization Tasks (Optional)
-   - Dev Agent reads modernization tasks from `specs/tasks/`
-   - Implements modernization tasks in the codebase
-   - Follows best practices and architectural patterns
-
-4. **`/deploy`** - Azure Deployment (Optional)
-   - Azure Agent deploys the modernized application to Azure
-   - Generates updated Bicep IaC templates and CI/CD workflows
-   - Uses Azure Dev CLI and MCP tools for deployment
-
-### Why Use Brownfield Workflow?
-
-- **Onboard new team members** - Comprehensive documentation of existing systems
-- **Legacy system understanding** - Reverse engineer undocumented codebases
-- **Pre-acquisition due diligence** - Document technical assets before purchase
-- **Migration planning** - Understand current state before modernization
-- **Audit and compliance** - Document what the system actually does
-- **Knowledge preservation** - Capture tribal knowledge before team changes
-- **Bridge to modernization** - After documenting, use greenfield workflow to add features
-
-## 📁 Documentation Structure
-
-The workflow creates living documentation:
+### Project Structure
 
 ```
-specs/
-├── prd.md              # Product Requirements Document
-├── features/           # Feature Requirements Documents
-│   ├── feature-1.md
-│   └── feature-2.md
-├── tasks/              # Technical Task Specifications
-│   ├── task-1.md
-│   ├── task-2.md
-│   ├── modernization/          # Modernization-specific tasks
-│   │   ├── dependency-upgrade-*.md # Dependency update tasks
-│   │   ├── architecture-refactor-*.md # Architecture improvement tasks
-│   │   ├── security-remediation-*.md # Security fix tasks
-│   │   └── performance-optimization-*.md # Performance improvement tasks
-│   └── testing/                # Testing and validation tasks
-│       ├── regression-test-*.md # Regression testing tasks
-│       ├── feature-validation-*.md # Feature continuity validation
-│       ├── performance-benchmark-*.md # Performance testing tasks
-│       └── integration-test-*.md # Integration testing tasks
-├── modernize/                    # Modernization strategy and plans
-│   ├── assessment/              # Analysis and assessment reports
-│   │   ├── technical-debt.md    # Technical debt analysis
-│   │   ├── security-audit.md    # Security vulnerabilities and gaps
-│   │   ├── performance-analysis.md # Performance bottlenecks and issues
-│   │   ├── architecture-review.md # Architecture assessment
-│   │   └── compliance-gaps.md   # Compliance and standards gaps
-│   ├── strategy/                # Modernization strategies
-│   │   ├── roadmap.md          # Overall modernization roadmap
-│   │   ├── technology-upgrade.md # Technology modernization plan
-│   │   ├── architecture-evolution.md # Architecture improvement plan
-│   │   ├── security-enhancement.md # Security modernization strategy
-│   │   └── devops-transformation.md # DevOps and operational improvements
-│   ├── plans/                   # Detailed implementation plans
-│   │   ├── migration-plan.md    # Step-by-step migration approach
-│   │   ├── testing-strategy.md  # Comprehensive testing approach
-│   │   ├── rollback-procedures.md # Rollback and contingency plans
-│   │   └── validation-criteria.md # Success criteria and validation
-│   └── risk-management/         # Risk assessment and mitigation
-│       ├── risk-analysis.md     # Risk identification and assessment
-│       ├── mitigation-strategies.md # Risk mitigation approaches
-│       └── contingency-plans.md # Emergency procedures and fallbacks
-└── docs/                 # Technical Documentation
-    ├── architecture/     # Architecture documentation
-    │   ├── overview.md   # System overview and context
-    │   ├── components.md # Component architecture
-    │   └── patterns.md   # Design patterns and conventions
-    ├── technology/       # Technology stack documentation
-    │   ├── stack.md      # Complete technology inventory
-    │   ├── dependencies.md # Dependencies and versions
-    │   └── tools.md      # Development and build tools
-    ├── infrastructure/   # Infrastructure and deployment
-    │   ├── deployment.md # Deployment architecture
-    │   ├── environments.md # Environment configuration
-    │   └── operations.md # Operational procedures
-    └── integration/      # External integrations
-        ├── apis.md       # External API integrations
-        ├── databases.md  # Database schemas and models
-        └── services.md   # External service dependencies
-src/
-├── backend/            # Backend implementation
-└── frontend/           # Frontend implementation
-
-apm_modules/            # APM packages (engineering standards)
-├── azure-standards/    # General Azure & engineering standards
-├── python-backend/     # Python backend standards (optional)
-└── react-frontend/     # React frontend standards (optional)
-
-AGENTS.md               # Root guidelines (generated by apm compile)
-apm.yml                 # APM package manifest
-mkdocs.yml              # MKdocs configuration for documentation site
-docs/                   # MKdocs documentation source files
+├── backend/              # FastAPI backend
+│   ├── app/
+│   │   ├── agents/      # LangGraph quiz generation pipeline
+│   │   ├── api/         # REST API endpoints
+│   │   ├── models/      # Pydantic data models
+│   │   ├── services/    # Wikipedia client
+│   │   └── utils/       # Caching utilities
+│   └── requirements.txt
+├── frontend/            # React frontend
+│   ├── src/
+│   │   ├── components/  # React components
+│   │   ├── services/    # API client
+│   │   └── types/       # TypeScript types
+│   └── package.json
+├── specs/               # Product & technical specs
+│   ├── prd.md          # Product requirements
+│   ├── features/       # Feature specifications
+│   └── adr/            # Architecture decisions
+└── docs/               # Documentation
 ```
 
-### Documentation with MKdocs
+## 🎮 How It Works
 
-This repository is configured with **MKdocs** for generating beautiful project documentation:
+1. **User Input**: Enter any Wikipedia topic and select number of questions
+2. **Content Retrieval**: System fetches Wikipedia article via API
+3. **AI Generation**: Azure OpenAI generates intelligent multiple-choice questions
+4. **Quality Validation**: Questions validated for clarity and accuracy
+5. **Interactive Quiz**: User answers questions in clean interface
+6. **Instant Results**: Immediate feedback with score and answer verification links
 
-- **Configuration**: `mkdocs.yml` contains site settings and navigation
-- **Source Files**: Documentation markdown files in `docs/` directory
-- **Standards**: Documentation practices defined in `standards/general/documentation-guidelines.md`
-- **Build & Serve**: Use MKdocs commands to preview and deploy documentation
+## 🔧 Development
 
-The documentation standards ensure consistency, accessibility, and maintainability across all project documentation.
+### Backend
 
-## 📦 Managing Standards with APM
+```powershell
+cd backend
+.\venv\Scripts\activate
+python -m app.main
 
-This repository uses **[APM (Agent Package Manager)](https://github.com/danielmeppiel/apm)** for managing engineering standards. APM provides:
-
-- ✅ **Zero-config setup** - `apm install` reads `apm.yml` and installs all dependencies
-- ✅ **Semantic versioning** - Lock to specific versions or use latest
-- ✅ **Automatic AGENTS.md** - `apm compile` generates guardrails from all packages
-- ✅ **Mix any standards** - Combine Microsoft, community, and custom packages
-- ✅ **One-command updates** - `apm update` to get latest standards
-
-### Built-in Standards
-
-By default, spec2cloud includes:
-- **azure-standards** - General engineering, documentation, agent-first patterns, CI/CD, security
-
-### Adding More Standards
-
-Edit `apm.yml` to add technology-specific standards:
-
-```yaml
-dependencies:
-  apm:
-    - EmeaAppGbb/azure-standards@1.0.0
-    - EmeaAppGbb/python-backend@1.0.0  # Add Python backend rules
-    - EmeaAppGbb/react-frontend@1.0.0  # Add React frontend rules
+# API docs: http://localhost:8000/docs
 ```
 
-Then run:
+### Frontend
 
-```bash
-apm install  # Install new packages
-apm compile  # Regenerate AGENTS.md with new standards
+```powershell
+cd frontend
+npm run dev
+
+# App: http://localhost:5173
 ```
 
-### Creating Custom Standards
+### Testing
 
-Create your own APM package:
+```powershell
+# Backend tests
+cd backend
+.\venv\Scripts\activate
+python test_backend.py
 
-```bash
-my-standards/
-├── apm.yml
-├── README.md
-└── .apm/
-    └── instructions/
-        ├── api-design.instructions.md
-        ├── database-patterns.instructions.md
-        └── security-rules.instructions.md
+# Manual API test
+curl http://localhost:8000/api/health
 ```
 
-Install from any GitHub repo:
+## 🌐 API Endpoints
 
-```bash
-# Public repo
-apm install your-org/your-standards
+- `POST /api/quiz/generate` - Generate a new quiz
+- `POST /api/quiz/submit` - Submit answers and get results
+- `GET /api/health` - Health check
 
-# Private repo (requires GITHUB_APM_PAT)
-export GITHUB_APM_PAT=your_token
-apm install your-org/private-standards
-```
+See full API documentation at http://localhost:8000/docs
 
-### Updating Standards
+## 📦 Built with Spec2Cloud
 
-```bash
-# Update all packages to latest
-apm update
+This project was built using the **[Spec2Cloud framework](SPEC2CLOUD_FRAMEWORK.md)** - an AI-powered development workflow that transforms product ideas into production-ready applications using specialized GitHub Copilot agents.
 
-# Update specific package
-apm update danielmeppiel/azure-standards
+The framework orchestrates:
+- **PM Agent** - Product requirements and feature specs
+- **Dev Lead Agent** - Technical review and standards
+- **Dev Agent** - Implementation and coding
+- **Azure Agent** - Cloud deployment and IaC
 
-# Regenerate AGENTS.md after updates
-apm compile
-```
+Learn more in [SPEC2CLOUD_FRAMEWORK.md](SPEC2CLOUD_FRAMEWORK.md).
 
-## 🎓 Example Usage
+## 📝 License
 
-### Greenfield Example (New Project)
-
-```bash
-# Start with your product idea
-"I want to create a smart AI agent for elderly care that tracks vitals and alerts caregivers"
-
-# Step 1: Create the PRD
-/prd
-
-# Step 2: Break down into features
-/frd
-
-# Step 3: Generate agent guidelines from standards (optional, can defer)
-/generate-agents
-
-# Step 4: Create technical plans
-/plan
-
-# Step 5a: Implement locally
-/implement
-
-# OR Step 5b: Delegate to GitHub Copilot
-/delegate
-
-# Step 6: Deploy to Azure
-/deploy
-```
-
-### Brownfield Example (Existing Project)
-
-```bash
-# You have an existing codebase with minimal or outdated documentation
-"I inherited a marketing campaign management app built in Python/React"
-
-# Step 1: Reverse engineer technical tasks from code
-/plan-brown
-# Agent analyzes codebase (Python FastAPI backend, React frontend)
-# Creates specs/tasks/ with honest documentation of what exists
-# Notes: "Task 008: Email service - stub only, not fully implemented"
-
-# Step 2: Synthesize feature requirements from tasks
-/frd-brown
-# Agent groups tasks into product features
-# Creates specs/features/campaign-management.md, user-authentication.md, etc.
-# Notes: "Email notifications feature - partially implemented"
-
-# Step 3: Create product vision from features
-/prd-brown
-# Agent synthesizes overall product purpose
-# Creates specs/prd.md with goals, scope, user stories
-# Includes "Product Status Assessment" with gaps and recommendations
-
-# Result: Complete documentation traceability
-# PRD → FRDs → Tasks → Code (with file paths)
-
-# Optional: Now enhance using greenfield workflow
-/frd  # Add new features to existing FRDs
-/plan # Create tasks for new features
-/implement # Build the enhancements
-```
-
-## 🔑 Key Benefits
-
-### Greenfield Benefits
-- **Zero Setup** - Dev container has everything preconfigured
-- **Structured Process** - Clear workflow from idea to production
-- **AI-Powered** - Specialized agents handle different aspects
-- **Best Practices** - Built-in architedtural guidance via `AGENTS.md` 
-- **Flexible Standards** - Choose local development or delegation
-- **Composable** - Add only the standards you need (Python, React, .NET, etc.)
-- **Versioned** - Lock to specific standard versions or use latest
-- **Azure-Ready** - Automated IaC and CI/CD generation
-
-### Brownfield Benefits
-- **Comprehensive Documentation** - Reverse engineer complete product docs from code
-- **Full Traceability** - Every product requirement links to code implementation
-- **Honest Assessment** - Identifies gaps, missing tests, incomplete features
-- **Technology Agnostic** - Works with any language/framework (.NET, Python, Node.js, Java, etc.)
-- **Knowledge Capture** - Preserves understanding before team changes
-- **Bridge to Modernization** - Document current state, then enhance with greenfield workflow
-- **Onboarding Accelerator** - New developers understand system architecture quickly
-
-### Universal Benefits
-- **Living Documentation** - Specs evolve with the codebase
-- **Bidirectional Workflow** - Start with idea OR start with code
-- **Specialized Agents** - PM, Dev, Dev Lead, and Azure agents with distinct roles
-- **Evidence-Based** - Brownfield never fabricates, greenfield builds intentionally
-
-## 📖 Learn More
-
-- See `AGENTS.md` for comprehensive engineering guidelines
-- Explore `.github/chatmodes/` for agent configurations
-- Review `.github/prompts/` for prompt templates
+MIT License - See [LICENSE.md](LICENSE.md)
 
 ## 🤝 Contributing
 
-Contributions welcome! Extend with additional agents, prompts, or MCP servers.
+Contributions welcome! This project demonstrates the Spec2Cloud workflow for building AI-powered applications.
 
 ---
 
-**From idea to production in minutes, not months.** 🚀
+**Generate quizzes on any topic in seconds!** 🚀
